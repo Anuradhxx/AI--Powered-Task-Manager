@@ -45,6 +45,4 @@ y_test_labels = label_encoder.inverse_transform(y_test_enc)
 
 print("\nXGBoost:\n", classification_report(y_test_labels, y_pred_xgb_labels))
 
-# Save model
-with open('models/priority_model_xgb.pkl', 'wb') as f:
-    pickle.dump(xgb, f)
+
