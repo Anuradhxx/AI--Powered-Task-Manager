@@ -1,0 +1,103 @@
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import SVC  # Support Vector Classifier
+from sklearn.metrics import accuracy_score
+import joblib
+import re
+import os
+
+# Update this to the absolute path where your CSV is located
+# Make sure that this path is correct
+csv_file_path = r"C:\Users\Haridhas\OneDrive\Documents\MultipleFiles\output_tfidf_features.csv"
+
+# Function to preprocess and split data
+def preprocess_and_split_data(df_path):
+    """
+    Loads data, extracts relevant columns, preprocesses text,
+    applies TF-IDF vectorization, and splits data into training and testing sets.
+    """
+    if not os.path.exists(df_path):
+        print(f"Error: The specified CSV file was not found at {df_path}")
+        return None, None, None, None, None
+
+    try:
+        df = pd.read_csv(df_path)
+
+        # Combine 'Project Name' and 'Task Name' for text features
+        df['combined_text'] = df['Project Name'].fillna('') + " " + df['Task Name'].fillna('')
+
+        # Use 'Project Type' as the target variable (labels)
+        labels = df['Project Type'].values
+
+        # Basic text cleaning
+        df['combined_text'] = df['combined_text'].apply(lambda x: re.sub(r'[^a-zA-Z\s]', '', x).lower())
+
+        # Initialize TF-IDF vectorizer
+        tfidf_vectorizer = TfidfVectorizer(max_features=1000)
+
+        # Fit and transform the combined text data
+        X = tfidf_vectorizer.fit_transform(df['combined_text'])
+
+        # Split data into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.3, random_state=42, stratify=labels)
+
+        print("Data has been processed and split successfully.")
+        return X_train, X_test, y_train, y_test, tfidf_vectorizer
+
+    except KeyError as e:
+        print(f"Error: Missing expected column in CSV: {e}. Please check 'Project Name', 'Task Name', and 'Project Type' columns.")
+        return None, None, None, None, None
+    except Exception as e:
+        print(f"An unexpected error occurred during data preprocessing: {e}")
+        return None, None, None, None, None
+
+# Train model function
+def train_and_save_models(df_path):
+    """
+    Trains Naive Bayes and SVM classifiers using TF-IDF features,
+    evaluates their performance, and saves the trained models and vectorizer.
+    """
+    X_train, X_test, y_train, y_test, tfidf_vectorizer = preprocess_and_split_data(df_path)
+
+    if X_train is None:
+        print("Model training aborted due to data preprocessing errors.")
+        return
+
+    # Save the TF-IDF vectorizer
+    joblib.dump(tfidf_vectorizer, 'tfidf_vectorizer.pkl')
+    print("TF-IDF vectorizer saved as 'tfidf_vectorizer.pkl'")
+
+    # Training Naive Bayes Classifier
+    print("\nTraining Naive Bayes Classifier...")
+    nb_model = MultinomialNB()
+    nb_model.fit(X_train, y_train)
+
+    # Evaluate Naive Bayes model
+    nb_y_pred = nb_model.predict(X_test)
+    nb_accuracy = accuracy_score(y_test, nb_y_pred)
+    print(f"Naive Bayes Model Accuracy: {nb_accuracy * 100:.2f}%")
+
+    # Save trained Naive Bayes model
+    joblib.dump(nb_model, 'naive_bayes_model.pkl')
+    print("Naive Bayes model saved as 'naive_bayes_model.pkl'")
+
+    # Training SVM Classifier
+    print("\nTraining SVM Classifier...")
+    svm_model = SVC(kernel='linear', random_state=42)
+    svm_model.fit(X_train, y_train)
+
+    # Evaluate SVM model
+    svm_y_pred = svm_model.predict(X_test)
+    svm_accuracy = accuracy_score(y_test, svm_y_pred)
+    print(f"SVM Model Accuracy: {svm_accuracy * 100:.2f}%")
+
+    # Save trained SVM model
+    joblib.dump(svm_model, 'svm_model.pkl')
+    print("SVM model saved as 'svm_model.pkl'")
+
+    print("\nAll models trained and saved successfully.")
+
+# Run the training function
+train_and_save_models(csv_file_path)
