@@ -1,0 +1,23 @@
+============================================================
+MODEL EVALUATION REPORT
+============================================================
+Timestamp: 2025-07-26 11:58:07
+Dataset: 300 samples
+Features: 415 TF-IDF features
+Classes: {'Other': 99, 'Renovation': 78, 'Construction': 60, 'Innovation': 21, 'Infrastructure': 21, 'Maintenance': 21}
+Train Set: 270 samples
+Test Set: 30 samples
+
+SVM Results:
+  Accuracy:  1.0000 (100.00%)
+  Precision: 1.0000
+  Recall:    1.0000
+
+  Confusion Matrix:
+    [6, 0, 0, 0, 0, 0]
+    [0, 2, 0, 0, 0, 0]
+    [0, 0, 2, 0, 0, 0]
+    [0, 0, 0, 2, 0, 0]
+    [0, 0, 0, 0, 10, 0]
+    [0, 0, 0, 0, 0, 8]
+

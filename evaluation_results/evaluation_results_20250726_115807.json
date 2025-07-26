@@ -1,0 +1,189 @@
+{
+  "timestamp": "2025-07-26 11:58:07",
+  "dataset_info": {
+    "total_samples": 300,
+    "features": 415,
+    "classes": {
+      "Other": 99,
+      "Renovation": 78,
+      "Construction": 60,
+      "Innovation": 21,
+      "Infrastructure": 21,
+      "Maintenance": 21
+    },
+    "train_samples": 270,
+    "test_samples": 30
+  },
+  "models": {
+    "SVM": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "confusion_matrix": [
+        [
+          6,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          2,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          2,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          10,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          8
+        ]
+      ],
+      "classification_report": {
+        "Construction": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 6.0
+        },
+        "Infrastructure": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 2.0
+        },
+        "Innovation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 2.0
+        },
+        "Maintenance": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 2.0
+        },
+        "Other": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 10.0
+        },
+        "Renovation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 8.0
+        },
+        "accuracy": 1.0,
+        "macro avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 30.0
+        },
+        "weighted avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 30.0
+        }
+      },
+      "predictions": [
+        "Renovation",
+        "Other",
+        "Construction",
+        "Innovation",
+        "Infrastructure",
+        "Construction",
+        "Other",
+        "Renovation",
+        "Other",
+        "Other",
+        "Other",
+        "Renovation",
+        "Construction",
+        "Construction",
+        "Other",
+        "Maintenance",
+        "Renovation",
+        "Other",
+        "Other",
+        "Renovation",
+        "Innovation",
+        "Construction",
+        "Other",
+        "Renovation",
+        "Other",
+        "Maintenance",
+        "Construction",
+        "Renovation",
+        "Renovation",
+        "Infrastructure"
+      ],
+      "true_labels": [
+        "Renovation",
+        "Other",
+        "Construction",
+        "Innovation",
+        "Infrastructure",
+        "Construction",
+        "Other",
+        "Renovation",
+        "Other",
+        "Other",
+        "Other",
+        "Renovation",
+        "Construction",
+        "Construction",
+        "Other",
+        "Maintenance",
+        "Renovation",
+        "Other",
+        "Other",
+        "Renovation",
+        "Innovation",
+        "Construction",
+        "Other",
+        "Renovation",
+        "Other",
+        "Maintenance",
+        "Construction",
+        "Renovation",
+        "Renovation",
+        "Infrastructure"
+      ]
+    }
+  }
+}
