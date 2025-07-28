@@ -157,11 +157,15 @@ if page == "🏠 Get Started":
         """)
     
     
-    
+
+
 
 # --- TASK ANALYSIS PAGE ---
-# --- TASK ANALYSIS PAGE ---
 elif page == "🔍 Analyze My Task":
+
+    # Initialize session state to store tasks
+    if "task_list" not in st.session_state:
+      st.session_state.task_list = []
 
     if error_messages is not None:
         st.error("🔧 AI models need to be set up first. Please check the 'Get Started' page.")
@@ -249,6 +253,10 @@ elif page == "🔍 Analyze My Task":
                     except Exception as e:
                         st.error(f"Error analyzing task {i}: {str(e)}")
 
+                        # Save all results to session_state
+                    st.session_state.task_list = results
+
+
             # Show summary table
             if results:
                 st.markdown("## 📋 Summary of All Tasks")
@@ -263,6 +271,33 @@ elif page == "🔍 Analyze My Task":
                     file_name="task_analysis_results.csv",
                     mime="text/csv"
                 )
+
+            # --- Manage Tasks Section ---
+            st.markdown("## ✅ Mark Completed Tasks")
+
+            # Initialize checkbox states once
+            if "checkbox_states" not in st.session_state:
+                st.session_state.checkbox_states = [False] * len(st.session_state.task_list)
+            
+            # Adjust length if tasks were removed or added
+            if len(st.session_state.checkbox_states) != len(st.session_state.task_list):
+                st.session_state.checkbox_states = [False] * len(st.session_state.task_list)
+            
+            new_task_list = []
+            new_checkbox_states = []
+            
+            for i, task_data in enumerate(st.session_state.task_list):
+                col1, col2 = st.columns([6, 1])
+                with col1:
+                    st.markdown(f"**{i+1}. {task_data['Task']}**  \n_Type: {task_data['Predicted Type']} | Priority: {task_data['Final Priority']}_")
+                with col2:
+                    done = st.checkbox("Done", key=f"done_{i}", value=st.session_state.checkbox_states[i])
+                    if not done:
+                        new_task_list.append(task_data)
+                        new_checkbox_states.append(False)
+            
+            st.session_state.task_list = new_task_list
+            st.session_state.checkbox_states = new_checkbox_states
 
 
 # --- PERFORMANCE PAGE ---
