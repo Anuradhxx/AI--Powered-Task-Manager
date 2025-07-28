@@ -8,7 +8,7 @@ import os
 # --- Page Configuration ---
 st.set_page_config(
     page_title="Smart Task Manager",
-    page_icon="🧠",
+    page_icon="📝",
     layout="centered",
     initial_sidebar_state="expanded"
 )
@@ -108,7 +108,7 @@ task_model, priority_model, vectorizer, error_messages = load_ai_models()
 # --- Main App ---
 st.markdown("""
 <div class="main-header">
-    <h1>🧠 Smart Task Manager</h1>
+    <h1>📝 Smart Task Manager</h1>
     <p>Let AI help you organize and prioritize your tasks!</p>
 </div>
 """, unsafe_allow_html=True)
@@ -158,177 +158,112 @@ if page == "🏠 Get Started":
     
     
     
-  
 
 # --- TASK ANALYSIS PAGE ---
+# --- TASK ANALYSIS PAGE ---
 elif page == "🔍 Analyze My Task":
-    
+
     if error_messages is not None:
         st.error("🔧 AI models need to be set up first. Please check the 'Get Started' page.")
         st.stop()
-    
-    st.markdown("## 🔍 Task Analysis")
-    st.markdown("Describe your task below and get instant insights!")
-    
-    # Check if we have an example task from the home page
-    default_text = ""
-    if hasattr(st.session_state, 'example_task') and hasattr(st.session_state, 'go_to_analyze'):
-        if st.session_state.go_to_analyze:
-            default_text = st.session_state.example_task
-            st.session_state.go_to_analyze = False
-    
-    # Task input
-    task_text = st.text_area(
-        "✏️ **What's your task?**",
-        value=default_text,
-        height=120,
-        placeholder="Example: Create a presentation for the client meeting next week",
-        help="Be as descriptive as you can - the more details, the better the analysis!"
+
+    st.markdown("## 🔍 Multi-Task Analyzer")
+    st.markdown("Enter multiple tasks (one per line). AI will classify and prioritize each. You can also set your own priority if needed.")
+
+    task_text_area = st.text_area(
+        "📝 Enter your tasks (one per line):",
+        height=200,
+        placeholder="Example:\nCreate a client report\nFix login bug\nUpdate documentation"
     )
-    
-    # Analyze button
-    if st.button("🚀 Analyze My Task", type="primary"):
-        if not task_text.strip():
-            st.warning("⚠️ Please describe your task first!")
+
+    analyze_button = st.button("🚀 Analyze Tasks")
+
+    if analyze_button:
+        tasks = [t.strip() for t in task_text_area.strip().split("\n") if t.strip()]
+        if not tasks:
+            st.warning("⚠️ Please enter at least one task.")
         else:
-            # Show loading
-            with st.spinner("🤔 AI is thinking about your task..."):
-                try:
-                    # Transform and predict
-                    vector = vectorizer.transform([task_text])
-                    
-                    # Get predictions
-                    task_type = task_model.predict(vector)[0]
-                    task_confidence = max(task_model.predict_proba(vector)[0])
-                    
-                    priority_level = priority_model.predict(vector)[0]
-                    priority_confidence = max(priority_model.predict_proba(vector)[0])
-                    
-                    # Show results
-                    st.markdown("---")
-                    st.markdown("## 🎯 Analysis Results")
-                    
-                    # Main predictions in colorful cards
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        confidence_text = "High confidence" if task_confidence > 0.7 else "Medium confidence" if task_confidence > 0.5 else "Low confidence"
-                        st.markdown(f"""
-                        <div class="prediction-box">
-                            <h3>🗂️ Task Type</h3>
-                            <h2 style="color: #667eea;">{task_type}</h2>
-                            <p style="margin: 0;"><small>{confidence_text}</small></p>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    with col2:
-                        # Color code priority
-                        priority_color = "#dc3545" if priority_level.lower() in ['high', 'urgent', 'critical'] else "#ffc107" if priority_level.lower() in ['medium', 'normal'] else "#28a745"
-                        priority_emoji = "🔥" if priority_level.lower() in ['high', 'urgent', 'critical'] else "⚡" if priority_level.lower() in ['medium', 'normal'] else "🟢"
-                        
-                        confidence_text = "High confidence" if priority_confidence > 0.7 else "Medium confidence" if priority_confidence > 0.5 else "Low confidence"
-                        st.markdown(f"""
-                        <div class="prediction-box">
-                            <h3>{priority_emoji} Priority Level</h3>
-                            <h2 style="color: {priority_color};">{priority_level}</h2>
-                            <p style="margin: 0;"><small>{confidence_text}</small></p>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    # Helpful tips based on results
-                    st.markdown("### 💡 Smart Suggestions")
-                    
-                    # Task type suggestions
-                    task_tips = {
-                        'Development': [
-                            "🔧 Break this into smaller coding tasks",
-                            "📝 Document your approach before starting",
-                            "🧪 Plan for testing and debugging time"
-                        ],
-                        'Design': [
-                            "🎨 Gather inspiration and references first",
-                            "👥 Get feedback early and often",
-                            "📱 Consider different screen sizes and devices"
-                        ],
-                        'Testing': [
-                            "📋 Create a test plan with clear steps",
-                            "🐛 Document any bugs you find",
-                            "✅ Test on different devices/browsers"
-                        ],
-                        'Documentation': [
-                            "📚 Keep it simple and easy to understand",
-                            "📸 Use screenshots and examples",
-                            "🔄 Review and update regularly"
-                        ],
-                        'Maintenance': [
-                            "⏰ Schedule regular maintenance windows",
-                            "💾 Always backup before making changes",
-                            "📊 Monitor the results after completion"
-                        ]
-                    }
-                    
-                    # Priority suggestions
-                    priority_tips = {
-                        'High': [
-                            "🚨 This needs immediate attention",
-                            "👥 Consider getting help or resources",
-                            "📅 Block time in your calendar today"
-                        ],
-                        'Critical': [
-                            "🔥 Drop everything else and focus on this",
-                            "📞 Communicate with stakeholders immediately",
-                            "🆘 Get all the help you need"
-                        ],
-                        'Medium': [
-                            "📅 Schedule this for this week",
-                            "📋 Add it to your task list",
-                            "⏰ Set a reasonable deadline"
-                        ],
-                        'Low': [
-                            "📚 This can wait for when you have free time",
-                            "💡 Consider if this is really necessary",
-                            "📅 Maybe schedule for next week or month"
-                        ]
-                    }
-                    
-                    # Show relevant tips
-                    tips_to_show = []
-                    
-                    # Add task-specific tips
-                    for task_key, tips in task_tips.items():
-                        if task_key.lower() in task_type.lower():
-                            tips_to_show.extend(tips[:2])  # Show first 2 tips
-                            break
-                    
-                    # Add priority-specific tips
-                    for priority_key, tips in priority_tips.items():
-                        if priority_key.lower() in priority_level.lower():
-                            tips_to_show.extend(tips[:2])  # Show first 2 tips
-                            break
-                    
-                    # Default tips if none match
-                    if not tips_to_show:
-                        tips_to_show = [
-                            "📋 Break complex tasks into smaller steps",
-                            "⏰ Estimate how long this will take",
-                            "🎯 Focus on the most important parts first"
-                        ]
-                    
-                    # Display tips in a nice format
-                    for tip in tips_to_show:
-                        st.markdown(f"""
-                        <div class="tips-box">
-                            {tip}
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    # Encouraging message
-                    st.success("🎉 Great! Now you have a clear understanding of your task. You've got this! 💪")
-                    
-                except Exception as e:
-                    st.error("😅 Oops! Something went wrong with the analysis. Please try again.")
-                    if st.checkbox("Show technical details"):
-                        st.error(f"Error: {e}")
+            results = []  # store each task result
+            
+            for i, task_text in enumerate(tasks, 1):
+                st.markdown(f"### 🧾 Task {i}")
+                with st.spinner(f"Analyzing Task {i}: {task_text[:40]}..."):
+                    try:
+                        vector = vectorizer.transform([task_text])
+                        task_type = task_model.predict(vector)[0]
+                        task_conf = max(task_model.predict_proba(vector)[0])
+
+                        priority_pred = priority_model.predict(vector)[0]
+                        priority_conf = max(priority_model.predict_proba(vector)[0])
+
+                        col1, col2 = st.columns(2)
+
+                        with col1:
+                            conf_label = "High" if task_conf > 0.7 else "Medium" if task_conf > 0.5 else "Low"
+                            st.markdown(f"""
+                            <div class="prediction-box">
+                                <h4>🗂️ Predicted Task Type</h4>
+                                <h3 style="color: #667eea;">{task_type}</h3>
+                                <p><small>{conf_label} confidence</small></p>
+                            </div>
+                            """, unsafe_allow_html=True)
+
+                        with col2:
+                            prio_label = "High" if priority_conf > 0.7 else "Medium" if priority_conf > 0.5 else "Low"
+                            color_map = {
+                                'high': "#dc3545", 'critical': "#dc3545",
+                                'medium': "#ffc107", 'normal': "#ffc107",
+                                'low': "#28a745"
+                            }
+                            prio_color = color_map.get(priority_pred.lower(), "#6c757d")
+                            emoji = "🔥" if "high" in priority_pred.lower() or "critical" in priority_pred.lower() else "⚡" if "medium" in priority_pred.lower() else "🟢"
+
+                            st.markdown(f"""
+                            <div class="prediction-box">
+                                <h4>{emoji} Predicted Priority</h4>
+                                <h3 style="color: {prio_color};">{priority_pred}</h3>
+                                <p><small>{prio_label} confidence</small></p>
+                            </div>
+                            """, unsafe_allow_html=True)
+
+                        # Manual priority override
+                        st.markdown("#### ✍️ Set Your Own Priority")
+                        custom_priority = st.selectbox(
+                            f"Override priority for Task {i}?",
+                            ["Use AI Prediction", "High", "Medium", "Low"],
+                            key=f"custom_prio_{i}"
+                        )
+
+                        final_priority = priority_pred if custom_priority == "Use AI Prediction" else custom_priority
+                        st.markdown(f"✅ **Final Priority**: `{final_priority}`")
+                        st.markdown("---")
+
+                        # Append final result
+                        results.append({
+                            "Task": task_text,
+                            "Predicted Type": task_type,
+                            "Predicted Priority": priority_pred,
+                            "Final Priority": final_priority
+                        })
+
+                    except Exception as e:
+                        st.error(f"Error analyzing task {i}: {str(e)}")
+
+            # Show summary table
+            if results:
+                st.markdown("## 📋 Summary of All Tasks")
+                df = pd.DataFrame(results)
+                st.dataframe(df)
+
+                # Optional: allow download as CSV
+                csv = df.to_csv(index=False).encode("utf-8")
+                st.download_button(
+                    label="⬇️ Download Results as CSV",
+                    data=csv,
+                    file_name="task_analysis_results.csv",
+                    mime="text/csv"
+                )
+
 
 # --- PERFORMANCE PAGE ---
 elif page == "📊 How Well Does It Work?":
